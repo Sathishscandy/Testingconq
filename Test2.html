@@ -3,63 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to COnquest CTF</title>
+    <title>Login Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 40px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2 {
-            color: #333;
-        }
-        .post {
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-        .post h2 {
-            color: #007BFF;
-        }
-        .date {
-            color: #777;
-            font-size: 0.9em;
-        }
-        .content {
-            margin-top: 10px;
-            line-height: 1.6;
-        }
-        .footer {
             text-align: center;
-            margin-top: 50px;
-            color: #555;
+            margin-top: 100px;
+        }
+        input {
+            margin: 10px;
+            padding: 10px;
         }
     </style>
 </head>
 <body>
+    <h1>CTF Login</h1>
+    <form method="POST" action="">
+        <input type="text" name="username" placeholder="Username"><br>
+        <input type="password" name="password" placeholder="Password"><br>
+        <input type="submit" value="Login">
+    </form>
 
-    <div class="container">
-        <h1>Thansk for participating in Conquest CTF</h1>
-        <p>Sharing thoughts, stories, and ideas.</p>
+    <?php
+    $conn = new mysqli("localhost", "root", "", "ctf_db");
 
-        <!-- Blog Post 1 -->
-        <div class="post">
-            <h2>First Blog Post</h2>
-            <p class="date">Published on: December 27, 2024</p>
-            <div class="content">
-                <p>This is my first blog post. I'm excited to start sharing my thoughts with the world. Stay tuned for more content!</p>
-            </div>
-        </div>
+    if ($conn->connect_error) {
+        die("Database connection failed");
+    }
 
+    if (isset($_POST['username']) && isset($_POST['password'])) {
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+
+        // Vulnerable Query
+        $query = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+        $result = $conn->query($query);
+
+        if ($result->num_rows > 0) {
+            echo "<h3>Welcome back, " . htmlspecialchars($username) . "!</h3>";
+            echo "<p>FLAG{SQLI_SUCCESS}</p>";
+        } else {
+            echo "<p>Invalid credentials.</p>";
+        }
+    }
+    ?>
 </body>
 </html>
-
-
